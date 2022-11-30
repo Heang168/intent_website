@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>G2 Team</title>
+    <!-- insert css -->
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        font-family: "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+          "Droid Sans", "Helvetica Neue", Arial, Helvetica, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: silver;
+        height: 100%;
+        margin: 0;
+      }
+
+      span {
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+
+      .mySubmit{
+        visibility: hidden;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .chat {
+        height: 300px;
+        width: 50vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      ::-webkit-input-placeholder {
+        color: 0.711;
+      }
+
+      input {
+        border: 0;
+        padding: 15px;
+        margin-left: auto;
+        border-radius: 10px;
+      }
+
+      .messages {
+        display: flex;
+        flex-direction: column;
+        overflow: scroll;
+        height: 90%;
+        width: 100%;
+        background-color: white;
+        padding: 15px;
+        margin: 15px;
+        border-radius: 10px;
+      }
+
+      #bot {
+        margin-right: auto;
+      }
+
+      #user {
+        margin-left: auto;
+      }
+
+      .bot {
+        font-family: Consolas, "Courier New", Menlo, source-code-pro, Monaco,
+          monospace;
+      }
+
+      .avatar {
+        height: 25px;
+      }
+
+      .response {
+        display: flex;
+        align-items: center;
+        margin: 1%;
+      }
+
+      .human{
+        text-align: center;
+      }
+
+      /* Mobile */
+
+      @media only screen and (max-width: 980px) {
+        .container {
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+        .chat {
+          width: 75vw;
+          margin: 10vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" class="container">
+      <img
+        src="https://cdn.pixabay.com/photo/2020/01/02/16/38/chatbot-4736275_960_720.png"
+        height="400vh"
+        alt="Chatbot clipart"
+      />
+
+      <div id="chat" class="chat">
+        <div id="messages" class="messages">
+          <h3> {{ prediction_text }}</h3>
+            <p>segmented: {{ additional["segmented"] }}</p>
+            <p>After StopWord: {{ additional["afterStopWord"] }}</p>
+        </div>
+        <form action="{{ url_for('predict') }}" method="POST">
+          <div class="form-group">
+           
+          <input type="text" placeholder="Write something..." class="form-control" id="sentences" aria-describedby="emailHelp" name="sentence">
+
+          </div>
+        
+     
+        <span class="mySubmit"><button type="submit" id="mybutton"></span>
+        </form>
+      </div>
+
+
+    </div>
+    <script>
+      const inputField = document.getElementById("sentences");
+      inputField.addEventListener("keydown", (e) => {
+        if (e.code === "Enter") {
+          output();
+        }
+      });
+
+      // answer prepare 
+      const answers = [
+        "Hello!",
+        "Hi!",
+        "Good, you?",
+        "Pretty well, how are you?",
+        "Nothing much",
+        "Exciting things!",
+        "Howdy",
+        "Hey",
+      ];
+
+      // sound or type
+      let utterances = [
+        "hello",
+        "hi",
+        "how are you",
+        "how are things",
+        "what is going on",
+        "what is up",
+        "howdy",
+        "hey",
+      ];
+
+      // random word when text input and answer prepare not match 
+      let alternatives = [
+        "hello",
+        "hi",
+        "how are you",
+        "how are things",
+        "what is going on",
+        "what is up",
+        "howdy",
+        "hey",
+      ];
+
+      function output() {
+        document.getElementById("myButton").click();
+      }
+
+      function compare(utterancesArray, answersArray, string) {
+        let reply;
+        let replyFound = false;
+        for (let x = 0; x < utterancesArray.length; x++) {
+          for (let y = 0; y < utterancesArray[x].length; y++) {
+            if (utterancesArray[x][y] === string) {
+              let replies = answersArray[x];
+              reply = replies[Math.floor(Math.random() * replies.length)];
+              replyFound = true;
+              break;
+            }
+          }
+          if (replyFound) {
+            break;
+          }
+        }
+        return reply;
+      }
+
+      function addChatEntry(input, product) {
+        const messagesContainer = document.getElementById("messages");
+        let userDiv = document.createElement("div");
+        userDiv.id = "user";
+        userDiv.className = "user response";
+        userDiv.innerHTML = `<span>${input}</span>`;
+        messagesContainer.appendChild(userDiv);
+
+        let botDiv = document.createElement("div");
+        let botText = document.createElement("span");
+        botDiv.id = "bot";
+        botDiv.className = "bot response";
+        botText.innerText = "Typing...";
+        botDiv.appendChild(botText);
+        messagesContainer.appendChild(botDiv);
+
+        messagesContainer.scrollTop =
+          messagesContainer.scrollHeight - messagesContainer.clientHeight;
+
+        setTimeout(() => {
+          botText.innerText = `${product}`;
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
